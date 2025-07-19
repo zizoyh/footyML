@@ -1,0 +1,9 @@
+# data/ball_dataset.yaml
+
+path: data/ball_dataset  # This is the root folder
+
+train: images/train
+val: images/val
+
+nc: 1
+names: ['ball']

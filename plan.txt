@@ -1,0 +1,216 @@
+Great — here's a **robust and modular project plan** for your soccer broadcast-to-2D tactical map system. This structure is designed to allow **modular development**, **testability**, and **iterative refinement**. I’ll also flag future extension areas and provide the exact responsibility of each file.
+
+---
+
+# 📁 Project Directory Structure
+
+```
+soccer2dmap/
+│
+├── main.py
+├── config.yaml
+├── requirements.txt
+│
+├── 📁 utils/
+│   ├── video_io.py
+│   ├── drawing.py
+│   ├── homography_utils.py
+│   ├── logging_utils.py
+│   └── geometry.py
+│
+├── 📁 models/
+│   ├── player_detector.py
+│   ├── ball_detector.py
+│   ├── tracker.py
+│   └── team_classifier.py
+│
+├── 📁 projection/
+│   ├── pitch_mapper.py
+│   └── camera_calibration.py
+│
+├── 📁 visualization/
+│   ├── render_2d_map.py
+│   └── pitch_layout.py
+│
+├── 📁 data/
+│   ├── pitch_templates/
+│   ├── example_games/
+│   └── annotations/
+│
+└── 📁 tests/
+    └── test_modules.py
+```
+
+---
+
+# 📄 `main.py`
+
+### 🔧 Entry point for the pipeline.
+
+* Loads config, video, and orchestrates modules.
+* Controls pipeline stage execution (e.g., detection, tracking, projection, visualization).
+* Handles CLI arguments for video path, output mode, etc.
+
+---
+
+# 📄 `config.yaml`
+
+### 🛠️ Central configuration file.
+
+Includes:
+
+* Model paths (YOLO weights, classifier)
+* Tracker parameters (e.g., IOU threshold, max age)
+* Homography corner coordinates
+* Video input/output settings
+* Debug mode toggles
+
+---
+
+## 📁 `utils/`
+
+### General-purpose helper modules.
+
+#### `video_io.py`
+
+* Frame extraction, downsampling
+* Frame iterator, cropping helpers
+
+#### `drawing.py`
+
+* Draw bounding boxes, labels, trails
+* Output annotated frames
+
+#### `homography_utils.py`
+
+* Estimate and apply homography
+* Point mapping to 2D pitch
+* Store/load homography matrices
+
+#### `logging_utils.py`
+
+* Time-stamped logging
+* Optional TensorBoard integration
+
+#### `geometry.py`
+
+* Helper math: point-in-polygon, intersection, distance
+
+---
+
+## 📁 `models/`
+
+### Encapsulated model logic for detection and tracking.
+
+#### `player_detector.py`
+
+* Loads YOLOv8
+* Runs inference per frame
+* Filters results (confidence threshold, class filtering)
+
+#### `ball_detector.py`
+
+* Loads separate ball detection model or uses YOLO class
+* Includes post-processing to handle false positives
+
+#### `tracker.py`
+
+* Wraps DeepSORT or ByteTrack
+* Assigns track IDs
+* Maintains state of each entity
+
+#### `team_classifier.py`
+
+* Classifies players into teams based on color/appearance
+* Could be rule-based (HSV range) or ML-based (CNN classifier)
+
+---
+
+## 📁 `projection/`
+
+### Camera calibration and spatial transformation logic.
+
+#### `camera_calibration.py`
+
+* Manages static or dynamic pitch calibration
+* Computes homography matrix from 4 field points
+* Could be extended to support auto-calibration
+
+#### `pitch_mapper.py`
+
+* Projects (x, y) player coordinates into 2D pitch layout
+* Converts bounding boxes to center points
+* Applies homography transformation
+
+---
+
+## 📁 `visualization/`
+
+### Tactical view and playback renderer.
+
+#### `render_2d_map.py`
+
+* Draws real-time 2D pitch view using player & ball positions
+* Optionally creates an animated video of the match
+* Generates static screenshots or live playback
+
+#### `pitch_layout.py`
+
+* Defines line art of pitch (bounding box, center circle, boxes)
+* Can use Matplotlib, Pygame, or custom canvas rendering
+
+---
+
+## 📁 `data/`
+
+### Input/output assets.
+
+#### `pitch_templates/`
+
+* Coordinates for standard field dimensions (UEFA, FIFA, etc.)
+
+#### `example_games/`
+
+* Test videos or frames for dev/testing
+
+#### `annotations/`
+
+* Homography keypoints
+* Manual validation results
+* Player/team ID ground truth (if applicable)
+
+---
+
+## 📁 `tests/`
+
+### Unit testing framework.
+
+#### `test_modules.py`
+
+* Basic PyTest or unittest cases to check:
+
+  * Model loading
+  * Homography accuracy
+  * Coordinate projection
+  * Team classifier sanity
+
+---
+
+# 🧠 Future Extensions
+
+* `models/pose_estimator.py`: Estimate player body direction using keypoints.
+* `models/action_recognizer.py`: Classify activities (pass, shot, tackle).
+* `networking/stream_input.py`: Live stream support.
+* `webui/`: Optional React+Flask frontend to control the system remotely.
+
+---
+
+# ✅ Next Steps
+
+1. I can help scaffold this entire repo with blank files and function headers.
+2. Then we implement modules step-by-step starting with `player_detector.py`.
+3. We’ll maintain a shared TODO checklist for component completion.
+
+---
+
+Would you like me to generate the scaffolded file structure and placeholder code to get started?

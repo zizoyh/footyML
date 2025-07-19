@@ -1,0 +1,12 @@
+pitch_length_m: 105
+pitch_width_m: 68
+
+zones:
+  center_circle_radius_m: 9.15
+  penalty_box:
+    width_m: 40.3
+    height_m: 16.5
+  six_yard_box:
+    width_m: 18.32
+    height_m: 5.5
+  goal_width_m: 7.32
