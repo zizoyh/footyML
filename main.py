@@ -1,14 +1,15 @@
 import cv2
 import os
 from models.ball_detector import BallDetector
+from models.ball_tracker import BallTracker
 
 # --- Configuration ---
-VIDEO_PATH = "data/clip.mp4"  # Replace with your actual video file
-MODEL_PATH = "models/yolov8_ball.pt"              # Replace with your trained YOLO model
+VIDEO_PATH = "data/raw_clips/clip2.mp4"
+MODEL_PATH = "runs/detect/train8/weights/best.pt"
 OUTPUT_PATH = "output/annotated_ball_output.mp4"
-CONFIDENCE_THRESHOLD = 0.25
+CONFIDENCE_THRESHOLD = 0.2
 DISPLAY_LIVE = True
-SAVE_OUTPUT = True
+SAVE_OUTPUT = False
 
 
 def initialize_detector():
@@ -34,16 +35,27 @@ def process_video(video_path, detector, conf_thresh, output_path=None):
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
+    tracker = BallTracker()
+
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
         detections = detector.detect(frame, conf_thresh=conf_thresh)
-        annotated = draw_detections(frame.copy(), detections)
+        ball_det = detections[0] if detections else None
+
+        tracker.update(ball_det)
+        tracked_box = tracker.get_tracked_bbox()
+
+        annotated = frame.copy()
+        if tracked_box:
+            x1, y1, x2, y2 = tracked_box
+            cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 255, 255), 2)
+            cv2.putText(annotated, "Ball (tracked)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
         if DISPLAY_LIVE:
-            cv2.imshow("Ball Detection", annotated)
+            cv2.imshow("Ball Detection + Tracking", annotated)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
@@ -55,17 +67,6 @@ def process_video(video_path, detector, conf_thresh, output_path=None):
         writer.release()
     if DISPLAY_LIVE:
         cv2.destroyAllWindows()
-
-
-def draw_detections(frame, detections):
-    """Draw bounding boxes on the detected ball(s)."""
-    for det in detections:
-        x1, y1, x2, y2 = det["bbox"]
-        conf = det["conf"]
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
-        label = f"Ball {conf:.2f}"
-        cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
-    return frame
 
 
 if __name__ == "__main__":
