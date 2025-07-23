@@ -18,7 +18,7 @@ class BallTracker:
 
         self.last_prediction = None
         self.frames_since_seen = 0
-        self.max_invisible_frames = 15  # stop showing box after this many misses
+        self.max_invisible_frames = 1  # stop showing box after this many misses
 
     def update(self, detection=None):
         if detection is not None:

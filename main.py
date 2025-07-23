@@ -5,9 +5,9 @@ from models.ball_tracker import BallTracker
 
 # --- Configuration ---
 VIDEO_PATH = "data/raw_clips/clip2.mp4"
-MODEL_PATH = "runs/detect/train8/weights/best.pt"
+MODEL_PATH = "runs/detect/train9/weights/best.pt"
 OUTPUT_PATH = "output/annotated_ball_output.mp4"
-CONFIDENCE_THRESHOLD = 0.2
+CONFIDENCE_THRESHOLD = 0.70
 DISPLAY_LIVE = True
 SAVE_OUTPUT = False
 
